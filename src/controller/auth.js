@@ -12,6 +12,7 @@ const redirection = async(req , res)=>{
     process.env.shopify_token = data.access_token
     process.env.shop = req.query.shop
 
+
     return res.json({
         success : true,
         message : "Authorization Done!"

@@ -1,11 +1,10 @@
 const express=require('express')
 const router=express.Router()
-// const {getAllSegment,createTopic,sendMessage} = require("../controller/segmentController");
+const {getAllSegment} = require("../controller/segmentController")
 
 //========================================= Controller =======================================================//
 
-// router.get("/getAllSegment",getAllSegment);
-// router.get("/topic",createTopic );
-// router.get("/notification",sendMessage);
+router.get("/getAllSegment", getAllSegment);
+
 
 module.exports=router
