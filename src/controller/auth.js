@@ -7,7 +7,9 @@ const auth = async(req , res)=>{
 }
 
 const redirection = async(req , res)=>{
-    return res.json(await redirects(req.query.code , req.query.shop))
+    const data = (await redirects(req.query.code , req.query.shop))
+    console.log(data)
+    res.json(data)
 }
 
 module.exports = {auth , redirection}
