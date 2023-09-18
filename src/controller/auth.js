@@ -3,7 +3,8 @@ const {authorize , redirects} = require("../utils/shopifyAuthHelper")
 
 const auth = async(req , res)=>{
     console.log(req.query.shop)
-    return res.redirect(await authorize(req.query.shop))
+    const data = res.redirect(await authorize(req.query.shop))
+    console.log(data)
 }
 
 const redirection = async(req , res)=>{

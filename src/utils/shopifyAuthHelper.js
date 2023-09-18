@@ -12,11 +12,12 @@ const redirects = async(code , shop)=>{
         method:'post',
         data : {}
     }).then(response=>{
+        console.log(response)
         return response
     }).catch(error=>{
         return error
     })
-
+    console.log(data)
     return data
 }
 
