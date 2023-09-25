@@ -7,4 +7,5 @@ const {getAllSegment , sendNotification} = require("../controller/segmentControl
 router.get("/getAllSegment", getAllSegment);
 router.post("/sendNotification", sendNotification);
 
+
 module.exports=router
