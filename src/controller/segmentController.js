@@ -53,17 +53,15 @@ const getAllSegment = async (req, res) => {
     res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 };
-
 const sendNotification = async (req, res) => {
   try {
-    const {title,body, segments } = req.body;
+    const { title, body, segments } = req.body;
 
     // Prepare the notification message
     const notificationMessage = {
       notification: {
         title: title,
-        body:body,
-        
+        body: body,
       },
       // Add other notification options as needed
     };
@@ -73,17 +71,27 @@ const sendNotification = async (req, res) => {
       const messaging = admin.messaging();
 
       // Send notifications to each segment
-      const sendPromises = segments.map((segment) => {
-        return messaging.send({
-          ...notificationMessage,
-          topic: segment,
-        });
+      const sendPromises = segments.map(async (segment) => {
+        try {
+          // Send the message to the topic (segment)
+          await messaging.send({
+            ...notificationMessage,
+            topic: segment,
+          });
+
+          // Topic sent successfully, now delete it
+          await messaging.deleteTopic(segment);
+
+          console.log(`Notification sent to and topic "${segment}" deleted.`);
+        } catch (error) {
+          console.error(`Error sending notification to topic "${segment}":`, error);
+        }
       });
 
-      // Wait for all notifications to be sent
+      // Wait for all notifications to be sent and topics to be deleted
       await Promise.all(sendPromises);
 
-      res.status(200).json({ success: true, message: 'Notifications sent successfully.' });
+      res.status(200).json({ success: true, message: 'Notifications sent and topics deleted successfully.' });
     } else {
       res.status(400).json({ success: false, message: 'No segments selected for notifications.' });
     }
