@@ -54,4 +54,44 @@ const getAllSegment = async (req, res) => {
   }
 };
 
-module.exports = { getAllSegment};
+const sendNotification = async (req, res) => {
+  try {
+    const {title,body, segments } = req.body;
+
+    // Prepare the notification message
+    const notificationMessage = {
+      notification: {
+        title: title,
+        body:body,
+        
+      },
+      // Add other notification options as needed
+    };
+
+    // Send the notification to selected segments
+    if (segments && segments.length > 0) {
+      const messaging = admin.messaging();
+
+      // Send notifications to each segment
+      const sendPromises = segments.map((segment) => {
+        return messaging.send({
+          ...notificationMessage,
+          topic: segment,
+        });
+      });
+
+      // Wait for all notifications to be sent
+      await Promise.all(sendPromises);
+
+      res.status(200).json({ success: true, message: 'Notifications sent successfully.' });
+    } else {
+      res.status(400).json({ success: false, message: 'No segments selected for notifications.' });
+    }
+  } catch (error) {
+    console.error('Error sending notifications:', error);
+    res.status(500).json({ success: false, message: 'Internal server error.' });
+  }
+};
+
+
+module.exports = { getAllSegment,sendNotification};

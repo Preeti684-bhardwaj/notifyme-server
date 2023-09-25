@@ -4,6 +4,14 @@ const dotenv=require('dotenv').config()
 const { PORT} = process.env;
 const cors=require('cors')
 
+const admin = require('firebase-admin');
+const serviceAccount = require('./serviceAccountKey.json'); // Replace with your Firebase Admin SDK credentials
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: 'https://your-firebase-project-id.firebaseio.com', // Replace with your Firebase Realtime Database URL
+});
+
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cors())
