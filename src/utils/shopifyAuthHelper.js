@@ -6,7 +6,7 @@ const authorize = async(shop)=>{
 }
 
 const redirects = async(code , shop)=>{
-    const shopifyOAuthUri = `https://${shop}/admin/oauth/access_token?client_id=${process.env.client_id}&cope=${process.env.scope}&client_secret=${process.env.client_secret}&code=${code}`
+    const shopifyOAuthUri = `https://${shop}/admin/oauth/access_token?client_id=${process.env.client_id}&scope=${process.env.scope}&client_secret=${process.env.client_secret}&code=${code}`
 
     const {data}=await axios({
         url:shopifyOAuthUri,

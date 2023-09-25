@@ -6,5 +6,4 @@ const {getAllSegment} = require("../controller/segmentController")
 
 router.get("/getAllSegment", getAllSegment);
 
-
 module.exports=router
