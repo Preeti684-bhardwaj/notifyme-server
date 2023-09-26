@@ -54,14 +54,6 @@ app.post('/api/firebase-credentials', (req, res) => {
   }
 });
 
-// handling uncaughtException  --> anyThing Not defined
-process.on("uncaughtException" , (err)=>{
-    console.log(`Error is ${err.message}`)
-    console.log(`Shutting down the server due to uncaughtException Error `)
-    
-    process.exit(1)
-})
-
 // Route Import
 const segmentRoute =require('./routes/segmentRoute')
 const shopifyAuthRoute=require("./routes/shopifyAuthRoute")
