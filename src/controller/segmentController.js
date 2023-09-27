@@ -1,6 +1,8 @@
 const axios = require('axios');
 const dotenv=require('dotenv').config()
 const { shop,shopify_token} = process.env;
+// const admin = require('firebase-admin');
+const { getMessaging }=require ("firebase/messaging/sw");
 
 const getAllSegment = async (req, res) => {
   try {
@@ -53,51 +55,59 @@ const getAllSegment = async (req, res) => {
     res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 };
+
 const sendNotification = async (req, res) => {
   try {
-    const { title, body, segments } = req.body;
+    const { title, body, segments,id } = req.body;
 
     // Prepare the notification message
     const notificationMessage = {
-      notification: {
-        title: title,
-        body: body,
-      },
-      // Add other notification options as needed
-    };
+  notification: {
+    title: title,
+    body: body,
+  },
+  topic: segments,
+  segmentId:id,
+};
 
-    // Send the notification to selected segments
-    if (segments && segments.length > 0) {
-      const messaging = admin.messaging();
+    // Initialize Firebase Messaging
+    // const messaging = admin.messaging();
 
-      // Send notifications to each segment
-      const sendPromises = segments.map(async (segment) => {
-        try {
-          // Send the message to the topic (segment)
-          await messaging.send({
-            ...notificationMessage,
-            topic: segment,
-          });
-
-          // Topic sent successfully, now delete it
-          await messaging.deleteTopic(segment);
-
-          console.log(`Notification sent to and topic "${segment}" deleted.`);
-        } catch (error) {
-          console.error(`Error sending notification to topic "${segment}":`, error);
-        }
-      });
-
-      // Wait for all notifications to be sent and topics to be deleted
-      await Promise.all(sendPromises);
-
-      res.status(200).json({ success: true, message: 'Notifications sent and topics deleted successfully.' });
-    } else {
-      res.status(400).json({ success: false, message: 'No segments selected for notifications.' });
+    if (!Array.isArray(segments) || segments.length === 0) {
+      return res.status(400).json({ success: false, message: 'No valid segments provided.' });
     }
+
+    console.log(notificationMessage);
+    // Send notifications to each segment and delete topics
+    const sendPromises = segments.map(async (segment) => {
+      try {
+        // Modify the segment (topic) name to ensure it's valid
+        const sanitizedSegment = segment.replace(/\s+/g, '_').toLowerCase();
+        console.log(sanitizedSegment);
+
+        // Send the message to the sanitized topic (segment)
+        await getMessaging().send({
+          ...notificationMessage,
+          topic: sanitizedSegment,
+        });
+
+        // Delete the topic after sending the notification
+        await getMessaging().deleteTopic(sanitizedSegment);
+
+        console.log(`Notification sent to topic and topic "${sanitizedSegment}" deleted.`);
+      } catch (error) {
+        console.error(`Error sending notification to topic "${segment}":`, error);
+      }
+    });
+
+    // Wait for all notifications to be sent and topics to be deleted
+    await Promise.all(sendPromises);
+
+    res.status(200).json({ success: true, message: 'Notifications sent and topics deleted successfully.' });
   } catch (error) {
     console.error('Error sending notifications:', error);
     res.status(500).json({ success: false, message: 'Internal server error.' });
   }
 };
+
 module.exports = { getAllSegment,sendNotification};

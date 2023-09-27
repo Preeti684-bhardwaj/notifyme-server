@@ -3,13 +3,13 @@ const app=express();
 const dotenv=require('dotenv').config()
 const { PORT} = process.env;
 const cors=require('cors')
-
+const admin = require('firebase-admin');
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cors())
 
 // API route to receive Firebase credentials from frontend
-app.post('/api/firebase-credentials', (req, res) => {
+app.post('/api/firebase-credentials', async (req, res) => {
   try {
     const { credentials } = req.body; // Assuming the frontend sends an object with a 'credentials' property
     if (!credentials) {
@@ -41,7 +41,7 @@ app.post('/api/firebase-credentials', (req, res) => {
       client_x509_cert_url: process.env.clientCertUrl,
       universe_domain: process.env.uniDomain,
     };
-
+console.log(firebaseConfig)
     admin.initializeApp({
       credential: admin.credential.cert(firebaseConfig),
       databaseURL: `https://${process.env.projectId}.firebaseio.com`, // Replace with your Firebase Realtime Database URL
@@ -53,14 +53,6 @@ app.post('/api/firebase-credentials', (req, res) => {
     res.status(500).json({ error: 'Internal server error.' });
   }
 });
-
-// handling uncaughtException  --> anyThing Not defined
-process.on("uncaughtException" , (err)=>{
-    console.log(`Error is ${err.message}`)
-    console.log(`Shutting down the server due to uncaughtException Error `)
-    
-    process.exit(1)
-})
 
 // Route Import
 const segmentRoute =require('./routes/segmentRoute')
