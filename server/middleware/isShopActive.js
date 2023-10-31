@@ -34,7 +34,7 @@ const isShopActive = async (req, res, next) => {
       )
       // await StoreModel.findOneAndUpdate({ shop }, { isActive: false });
     }
-    res.redirect(`/auth?shop=${shop}&host=${host}`);
+    res.redirect(`${process.env.SHOPIFY_APP_URL}/api/auth?shop=${shop}&host=${host}`);
   } else {
     next();
   }
